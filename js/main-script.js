@@ -18,7 +18,11 @@ var ToggleDirectionalLight = false;
 var GouraudActive = false;
 var PhongActive = false;
 var CartoonActive = false;
+var NormalMapActive = false;
 
+var BasicActive = false;
+
+var clock = new THREE.Clock();
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -185,6 +189,13 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
         case 68: case 100: ToggleDirectionalLight = true; break; // D/d
+
+        case 81: GouraudActive = true; break; // Q/q
+        case 87: PhongActive = true; break;   // W/w
+        case 69: CartoonActive = true; break; // E/e
+        case 82: NormalMapActive = true; break; // R/r
+        
+        case 84: BasicActive = true; break; // T/t
     }
 
 }
