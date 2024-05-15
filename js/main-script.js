@@ -74,7 +74,7 @@ function createAmbientLight() {
 ////////////////////////
 
 function createObjects() {
-    //createDirectionalLight();
+    createDirectionalLight();
     createAmbientLight();
 
     // Create a cube and add it to the scene
@@ -106,12 +106,12 @@ function handleCollisions(){
 function update(){
     'use strict';
 
-    /* if (ToggleDirectionalLight){
+    if (ToggleDirectionalLight){
         directionalLight.visible = !directionalLight.visible;
         ToggleDirectionalLight = false;
-      }
+    }
     
-      */
+    
 
 }
 
@@ -183,9 +183,9 @@ function onResize() {
 function onKeyDown(e) {
     'use strict';
 
-    /*switch (e.keyCode) {
+    switch (e.keyCode) {
         case 68: case 100: ToggleDirectionalLight = true; break; // D/d
-    }*/
+    }
 
 }
 
