@@ -8,19 +8,19 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 /* GLOBAL VARIABLES */
 //////////////////////
 var camera, scene, renderer;
-var geometry, mesh, light;
+var geometry, material, mesh;
 
 var directionalLight;
 var ambientLight;
 
 var ToggleDirectionalLight = false;
+var toggleBasic = false;
 
+var BasicActive = false;
 var GouraudActive = false;
 var PhongActive = false;
 var CartoonActive = false;
 var NormalMapActive = false;
-
-var BasicActive = false;
 
 var clock = new THREE.Clock();
 
@@ -29,7 +29,7 @@ var materials = {
     'phong': new THREE.MeshPhongMaterial({ color: 0x00ff00 }),
     'gouraud': new THREE.MeshLambertMaterial({ color: 0x00ff00 }),
     'cartoon': new THREE.MeshToonMaterial({ color: 0x00ff00 }),
-    'normalMap': new THREE.MeshNormalMaterial({ color: 0x00ff00 }),
+    'normalMap': new THREE.MeshNormalMaterial(),
 };
 
 /////////////////////
@@ -90,8 +90,8 @@ function createObjects() {
     createAmbientLight();
 
     // Create a cube and add it to the scene
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+    geometry = new THREE.BoxGeometry(1, 1, 1);
+    material = materials['phong']
     var cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
 }
@@ -122,9 +122,6 @@ function update(){
         directionalLight.visible = !directionalLight.visible;
         ToggleDirectionalLight = false;
     }
-    
-    
-
 }
 
 /////////////
@@ -207,7 +204,7 @@ function onKeyDown(e) {
         case 69: CartoonActive = true; break; // E/e
         case 82: NormalMapActive = true; break; // R/r
         
-        case 84: BasicActive = true; break; // T/t
+        case 84: toggleBasic = true; break; // T/t
     }
 
 }
