@@ -24,6 +24,14 @@ var BasicActive = false;
 
 var clock = new THREE.Clock();
 
+var materials = {
+    'basic': new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+    'phong': new THREE.MeshPhongMaterial({ color: 0x00ff00 }),
+    'gouraud': new THREE.MeshLambertMaterial({ color: 0x00ff00 }),
+    'cartoon': new THREE.MeshToonMaterial({ color: 0x00ff00 }),
+    'normalMap': new THREE.MeshNormalMaterial({ color: 0x00ff00 }),
+};
+
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
@@ -139,8 +147,8 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+    document.body.appendChild(VRButton.createButton(renderer));
     renderer.xr.enabled = true;
-    //document.body.appendChild(VRButton.createButton(renderer));
 
     createScene();
     createCamera();
@@ -162,7 +170,11 @@ function animate() {
     update();
     render();
 
+    renderer.setAnimationLoop( function () {
 
+        renderer.render( scene, camera );
+    
+    } );
 
     requestAnimationFrame(animate);
 }
