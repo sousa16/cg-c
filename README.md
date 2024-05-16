@@ -1,1 +1,1 @@
-Install WebXR emulator on browser to user VRButton
+Install WebXR emulator on browser to use VRButton
