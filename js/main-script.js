@@ -10,11 +10,10 @@ import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.j
 //////////////////////
 
 var camera, scene, renderer, aspectRatio, clock;
-var activeCamera, frontCamera, sideCamera, topCamera, orthographicCamera, perspectiveCamera, mobileCamera;
 
 var materials;
 
-var carousel, ring1, ring2, ring3, parametric1;
+var carousel, ring1, ring2, ring3;
 
 var cylBaseGeometry, cylBaseMesh;
 var ring1UpGeometry, ring1UpMesh, ring1DownGeometry, ring1DownMesh, ring1HeightGeometry, ring1HeightMesh;
@@ -70,41 +69,18 @@ function createScene(){
 /* CREATE CAMERA(S) */
 //////////////////////
 
-/*ISTO É SÓ PARA DEBUG, DEPOIS TEMOS DE MUDAR ESTAS CAMARAS*/
 function createCamera() {
-    'use strict';
+    "use strict";
 
-    aspectRatio = window.innerWidth / window.innerHeight;
+    camera = new THREE.PerspectiveCamera(
+      90,
+      window.innerWidth / window.innerHeight,
+      1,
+      1000
+    );
 
-    // Frontal camera
-    frontCamera = new THREE.OrthographicCamera(window.innerWidth / -10, window.innerWidth / 10, window.innerHeight / 10, window.innerHeight / -10, 1, 1000);
-    frontCamera.position.z = 200;
-
-    // Side camera
-    sideCamera = new THREE.OrthographicCamera(window.innerWidth / -10, window.innerWidth / 10, window.innerHeight / 10, window.innerHeight / -10, 1, 1000);
-    sideCamera.position.x = 200;
-
-    // Top camera
-    topCamera = new THREE.OrthographicCamera(window.innerWidth / -10, window.innerWidth / 10, window.innerHeight / 10, window.innerHeight / -10, 1, 1000);
-    topCamera.position.y = 200;
-
-    // Orthographic camera
-    orthographicCamera = new THREE.OrthographicCamera(window.innerWidth / -10, window.innerWidth / 10, window.innerHeight / 10, window.innerHeight / -10, 1, 1000);
-    orthographicCamera.position.set(100, 100, 100); // Position it off the main axes
-
-    // Perspective camera
-    perspectiveCamera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
-    perspectiveCamera.position.set(100, 100, 100); // Position it off the main axes
-
-
-    activeCamera = frontCamera;
-
-    // Make sure they're pointing towards the scene
-    frontCamera.lookAt(scene.position);
-    sideCamera.lookAt(scene.position);
-    topCamera.lookAt(scene.position);
-    orthographicCamera.lookAt(scene.position);
-    perspectiveCamera.lookAt(scene.position);
+    camera.position.set(0,60,90);
+    camera.lookAt(0,5,0);
 }
 
 /////////////////////
@@ -696,7 +672,7 @@ function update(){
 /////////////
 function render() {
     'use strict';
-	renderer.render(scene, activeCamera);
+	renderer.render(scene, camera);
 
 }
 
@@ -777,34 +753,6 @@ function onKeyDown(e) {
             break;
         case 51: //3
 			key3 = true;
-            break;
-
-
-		/*APAGAR*/
-        case 81: //q
-            activeCamera = frontCamera;
-            prevKey = activeKey;
-            activeKey = 1;
-            break;
-        case 87: //w
-            activeCamera = sideCamera;
-            prevKey = activeKey;
-            activeKey = 2;
-            break;
-        case 69: //e
-            activeCamera = topCamera;
-            prevKey = activeKey;
-            activeKey = 3;
-            break;
-        case 82: //r
-            activeCamera = orthographicCamera;
-            prevKey = activeKey;
-            activeKey = 4;
-            break;
-        case 84: //t
-            activeCamera = perspectiveCamera;
-            prevKey = activeKey;
-            activeKey = 5;
             break;
 
     }
