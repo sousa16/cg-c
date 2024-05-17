@@ -9,9 +9,10 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 //////////////////////
 var camera, scene, renderer;
 var geometry, material, mesh;
+var objects = [];
+var originalMaterials = [];
 
-var directionalLight;
-var ambientLight;
+var directionalLight, ambientLight
 
 var ToggleDirectionalLight = false;
 var toggleBasic = false;
@@ -92,8 +93,33 @@ function createObjects() {
     // Create a cube and add it to the scene
     geometry = new THREE.BoxGeometry(1, 1, 1);
     material = materials['phong']
-    var cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    mesh = new THREE.Mesh(geometry, material);
+    objects.push(mesh);
+    scene.add(mesh);
+
+    // Create a cylinder and add it to the scene
+    geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
+    material = materials['lambert']
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(5, 0, 0);
+    objects.push(mesh);
+    scene.add(mesh);
+
+    // Create a sphere and add it to the scene
+    geometry = new THREE.SphereGeometry(1, 32, 32);
+    material = materials['cartoon']
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(2, 0, 0);
+    objects.push(mesh);
+    scene.add(mesh);
+
+    // Create a torus and add it to the scene
+    geometry = new THREE.TorusGeometry(1, 0.4, 16, 100);
+    material = materials['normalMap']
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(-2, 0, 0);
+    objects.push(mesh);
+    scene.add(mesh);
 }
 
 //////////////////////
@@ -122,6 +148,55 @@ function update(){
         directionalLight.visible = !directionalLight.visible;
         ToggleDirectionalLight = false;
     }
+
+    if (GouraudActive){
+        for (var i = 0; i < objects.length; i++) {
+            objects[i].material = materials["gouraud"];
+        }
+        GouraudActive = false;
+    }
+
+    if (PhongActive){
+        for (var i = 0; i < objects.length; i++) {
+            objects[i].material = materials["phong"];
+        }
+        PhongActive = false;
+    }
+
+    if (CartoonActive){
+        for (var i = 0; i < objects.length; i++) {
+            objects[i].material = materials["cartoon"];
+        }
+        CartoonActive = false;
+    }
+
+    if (NormalMapActive){
+        for (var i = 0; i < objects.length; i++) {
+            objects[i].material = materials["normalMap"];
+        }
+        NormalMapActive = false;
+    }
+
+    if (toggleBasic) {
+        if (BasicActive) {
+            for (var i = 0; i < objects.length; i++) {
+                objects[i].material = originalMaterials[i];
+            }
+            BasicActive = false;
+        }
+
+        else {
+            for (var i = 0; i < objects.length; i++) {
+                originalMaterials[i] = objects[i].material;
+                objects[i].material = materials["basic"];
+            }
+            BasicActive = true;
+        }
+
+        toggleBasic = false;
+    }
+
+
 }
 
 /////////////
