@@ -285,7 +285,7 @@ function createRing3(obj, x, y, z) {
 
 	var ringShape = new THREE.Shape();
 	ringShape.moveTo(30, 0);
-	ringShape.absarc(0, 0, 40, 0, Math.PI * 2, false);
+	ringShape.absarc(0, 0, 10, 0, Math.PI * 2, false);
 	ringShape.moveTo(30, 0);
 	ringShape.absarc(0, 0, 40, 0, Math.PI * 2, true);
 
@@ -301,12 +301,12 @@ function createRing3(obj, x, y, z) {
 	ring3HeightMesh.rotation.x = Math.PI / 2;
 	ring3HeightMesh.position.set(x, y, z);
 
-	ring3UpGeometry = new THREE.RingGeometry(30, 40, 100);
+	ring3UpGeometry = new THREE.RingGeometry(30, 40, 30);
 	ring3UpMesh = new THREE.Mesh(ring3UpGeometry, basicMaterials["red"]);
 	ring3UpMesh.rotation.x = Math.PI / 2;
 	ring3UpMesh.position.set(x, y, z);
 
-	ring3DownGeometry = new THREE.RingGeometry(30, 40, 100);
+	ring3DownGeometry = new THREE.RingGeometry(30, 40, 30);
 	ring3DownMesh = new THREE.Mesh(ring3DownGeometry, basicMaterials["red"]);
 	ring3DownMesh.rotation.x = Math.PI / 2;
 	ring3DownMesh.position.set(x, y - 10, z);
@@ -343,7 +343,7 @@ function createParametric1(obj, x, y, z) {
 	function customFunction(u, v, vector) {
 		var x = u * Math.PI;
 		var y = v * Math.PI;
-		var z = Math.sin(u * Math.PI) * Math.cos(v * Math.PI);
+		var z = Math.sin(u * Math.PI) * Math.cos(v * Math.PI) * 1.5;
 		vector.set(x - 1.5, y, z);
 	}
 	if (obj == ring1) {
@@ -366,7 +366,7 @@ function createParametric1(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par1R3Geometry = new ParametricGeometry(customFunction, 25, 25);
-		par1R3Mesh = new THREE.Mesh(par1R3Geometry, basicMaterials["red"]);
+		par1R3Mesh = new THREE.Mesh(par1R3Geometry, basicMaterials["orange"]);
 		par1R3Mesh.position.set(x + 15, y, z);
 
 		obj.add(par1R3Mesh);
@@ -433,22 +433,37 @@ function createParametric3(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-		var radius = 2;
-		var height = 4;
+        var radius = 2;
+        var height = 4;
 
-		var theta = u * 2 * Math.PI;
-		var xpos = radius * Math.cos(theta);
-		var ypos = v * height - height / 2;
-		var zpos = radius * Math.sin(theta);
+        var xpos, ypos, zpos;
 
-		var angle = Math.PI / 6;
-		var cosAngle = Math.cos(angle);
-		var sinAngle = Math.sin(angle);
+        if (v < 0.05) { // Cylinder base
+            var r = radius * (v / 0.05);
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = -height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else if (v > 0.95) { // Cylinder top
+            var r = radius * ((1 - v) / 0.05);
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else { // Cylinder boddy
+            var theta = u * 2 * Math.PI;
+            xpos = radius * Math.cos(theta);
+            ypos = v * height - height / 2;
+            zpos = radius * Math.sin(theta);
+        }
 
-		var xRot = xpos * cosAngle - ypos * sinAngle;
-		var yRot = xpos * sinAngle + ypos * cosAngle;
+        // Cylinder rotation
+        var angle = Math.PI / 6;
+        var cosAngle = Math.cos(angle);
+        var sinAngle = Math.sin(angle);
 
-		vector.set(xRot, yRot + 3, zpos);
+        var xRot = xpos * cosAngle - ypos * sinAngle;
+        var yRot = xpos * sinAngle + ypos * cosAngle;
+
+        vector.set(xRot, yRot + 3, zpos);
 	}
 	if (obj == ring1) {
 		par3R1Geometry = new ParametricGeometry(functionP, 30, 30);
@@ -483,22 +498,32 @@ function createParametric4(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-		var radius = 3;
-		var height = 5;
+        var radius = 3;
+        var height = 5;
 
-		var theta = u * 2 * Math.PI;
-		var r = (1 - v) * radius;
-		var xpos = r * Math.cos(theta);
-		var ypos = v * height - height / 2;
-		var zpos = r * Math.sin(theta);
+        var xpos, ypos, zpos;
 
-		var angle = Math.PI / 12;
-		var cosAngle = Math.cos(angle);
-		var sinAngle = Math.sin(angle);
-		var xRot = xpos * cosAngle - ypos * sinAngle;
-		var yRot = xpos * sinAngle + ypos * cosAngle;
+        if (v < 0.05) { // cone base
+            var r = radius * (v / 0.05);
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = -height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else { // cone boddy
+            var theta = u * 2 * Math.PI;
+            var r = (1 - v) * radius;
+            xpos = r * Math.cos(theta);
+            ypos = v * height - height / 2;
+            zpos = r * Math.sin(theta);
+        }
 
-		vector.set(xRot, yRot, zpos);
+        // cone rotation
+        var angle = Math.PI / 12;
+        var cosAngle = Math.cos(angle);
+        var sinAngle = Math.sin(angle);
+        var xRot = xpos * cosAngle - ypos * sinAngle;
+        var yRot = xpos * sinAngle + ypos * cosAngle;
+
+        vector.set(xRot, yRot, zpos);
 	}
 	if (obj == ring1) {
 		par4R1Geometry = new ParametricGeometry(functionP, 32, 32);
@@ -533,16 +558,33 @@ function createParametric5(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-		var size = 4;
+        var baseRadius = 2;
+        var topRadius = 1;
+        var height = 4;
 
-		var xCoord = size * (u - 0.5);
-		var yCoord = size * (v - 0.5);
-		var zCoord = size * (v - 0.5);
+        var xpos, ypos, zpos;
 
-		vector.set(xCoord, yCoord, zCoord);
+        if (v < 0.05) { // base
+            var r = baseRadius * v;
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = -height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else if (v > 0.95) { // top
+            var r = topRadius * ((1 - v) / 0.05);
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else { // boddy
+            var blendRadius = baseRadius - (baseRadius - topRadius) * (v - 0.05) / 0.9;
+            xpos = blendRadius * Math.cos(u * 2 * Math.PI);
+            ypos = v * height - height / 2;
+            zpos = blendRadius * Math.sin(u * 2 * Math.PI);
+        }
+
+        vector.set(xpos, ypos, zpos);
 	}
 	if (obj == ring1) {
-		par5R1Geometry = new ParametricGeometry(functionP, 32, 32);
+		par5R1Geometry = new ParametricGeometry(functionP, 25, 25);
 		par5R1Mesh = new THREE.Mesh(par5R1Geometry, cartoonMaterials["orange"]);
 		par5R1Mesh.position.set(x - 15, y + 2, z);
 
@@ -665,7 +707,7 @@ function createParametric7(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par7R3Geometry = new ParametricGeometry(functionP, 32, 32);
-		par7R3Mesh = new THREE.Mesh(par7R3Geometry, phongMaterials["red"]);
+		par7R3Mesh = new THREE.Mesh(par7R3Geometry, phongMaterials["pink"]);
 		par7R3Mesh.position.set(x, y + 1.3, z + 15);
 
 		obj.add(par7R3Mesh);
@@ -678,23 +720,42 @@ function createParametric8(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-		var scale = 3;
+        var baseRadius = 1;
+        var topRadius = 3;
+        var height = 5;
 
-		var xCoord = Math.cos(u * Math.PI) * Math.cos(v * Math.PI);
-		var yCoord = Math.cos(u * Math.PI) * Math.sin(v * Math.PI);
-		var zCoord = Math.sin(u * Math.PI);
+        var xpos, ypos, zpos;
 
-		xCoord *= scale;
-		yCoord *= scale;
-		zCoord *= scale;
+        if (v < 0.05) { // base
+            var r = baseRadius * v;
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = -height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else if (v > 0.95) { // top
+            var r = topRadius * ((1 - v) / 0.05);
+            xpos = r * Math.cos(u * 2 * Math.PI);
+            ypos = height / 2;
+            zpos = r * Math.sin(u * 2 * Math.PI);
+        } else { // boddy
+            var blendRadius = baseRadius - (baseRadius - topRadius) * (v - 0.05) / 0.9;
+            xpos = blendRadius * Math.cos(u * 2 * Math.PI);
+            ypos = v * height - height / 2;
+            zpos = blendRadius * Math.sin(u * 2 * Math.PI);
+        }
 
-		vector.set(xCoord, yCoord, zCoord - 1);
+        // Inclinação do cilindro
+        var tiltAngle = Math.PI / 6; // Ângulo de inclinação (30 graus)
+        var newXpos = xpos;
+        var newZpos = zpos * Math.cos(tiltAngle) - ypos * Math.sin(tiltAngle);
+        ypos = zpos * Math.sin(tiltAngle) + ypos * Math.cos(tiltAngle);
+
+        vector.set(newXpos, ypos, newZpos);
 
 	}
 	if (obj == ring1) {
 		par8R1Geometry = new ParametricGeometry(functionP, 32, 32);
-		par8R1Mesh = new THREE.Mesh(par8R1Geometry, gouraudMaterials["dark green"]);
-		par8R1Mesh.position.set(x + 11, y + 3.3, z + 11);
+		par8R1Mesh = new THREE.Mesh(par8R1Geometry, gouraudMaterials["white"]);
+		par8R1Mesh.position.set(x + 11, y + 2.6, z + 11);
 
 		obj.add(par8R1Mesh);
 		objects.push(par8R1Mesh);
@@ -703,7 +764,7 @@ function createParametric8(obj, x, y, z) {
 	if (obj == ring2) {
 		par8R2Geometry = new ParametricGeometry(functionP, 32, 32);
 		par8R2Mesh = new THREE.Mesh(par8R2Geometry, gouraudMaterials["green"]);
-		par8R2Mesh.position.set(x + 11, y + 3.3, z + 11);
+		par8R2Mesh.position.set(x + 11, y + 2.6, z + 11);
 
 		obj.add(par8R2Mesh);
 		objects.push(par8R2Mesh);
@@ -712,7 +773,7 @@ function createParametric8(obj, x, y, z) {
 	if (obj == ring3) {
 		par8R3Geometry = new ParametricGeometry(functionP, 32, 32);
 		par8R3Mesh = new THREE.Mesh(par8R3Geometry, gouraudMaterials["orange"]);
-		par8R3Mesh.position.set(x + 11, y + 3.3, z + 11);
+		par8R3Mesh.position.set(x + 11, y + 2.6, z + 11);
 
 		obj.add(par8R3Mesh);
 		objects.push(par8R3Mesh);
@@ -764,10 +825,10 @@ function update() {
 
             // Select a random color name
             var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
-            
+
             // Use the random color name to access a random material
             var randomMaterial = gouraudMaterials[randomColorName];
-    
+
             // Assign the random material to the object
             objects[i].material = randomMaterial;
         }
@@ -781,10 +842,10 @@ function update() {
 
             // Select a random color name
             var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
-            
+
             // Use the random color name to access a random material
             var randomMaterial = phongMaterials[randomColorName];
-    
+
             // Assign the random material to the object
             objects[i].material = randomMaterial;
         }
@@ -798,10 +859,10 @@ function update() {
 
             // Select a random color name
             var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
-            
+
             // Use the random color name to access a random material
             var randomMaterial = cartoonMaterials[randomColorName];
-    
+
             // Assign the random material to the object
             objects[i].material = randomMaterial;
         }
@@ -832,10 +893,10 @@ function update() {
 
                 // Select a random color name
                 var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
-                
+
                 // Use the random color name to access a random material
                 var randomMaterial = basicMaterials[randomColorName];
-        
+
                 // Assign the random material to the object
                 objects[i].material = randomMaterial;
 			}
