@@ -12,6 +12,7 @@ var camera, scene, renderer;
 var geometry, material, mesh;
 var objects = [];
 var originalMaterials = [];
+var basicMaterials = {}, cartoonMaterials = {}, gouraudMaterials = {}, phongMaterials = {};
 
 var directionalLight, ambientLight
 
@@ -46,30 +47,34 @@ var key3 = false;
 var clock = new THREE.Clock();
 
 var colors = {
-	"dark grey": 0x444745,
-	"white": 0xffffff,
-	"yellow": 0xffd700,
-	"red": 0xd71b12,
-	"pink": 0xf757d7,
-	"blue": 0x0b0fd3,
-	"orange": 0xeb6900,
-	"purple": 0x9000eb,
-	"dark green": 0x257203,
-	"dark green 1": 0x206a00,
-	"dark green 2": 0x00450e,
-	"transparent": 0x87CEFA,
+    "dark grey": 0x444745,
+    "white": 0xffffff,
+    "yellow": 0xffd700,
+    "red": 0xd71b12,
+    "pink": 0xf757d7,
+    "blue": 0x0b0fd3,
+    "orange": 0xeb6900,
+    "purple": 0x9000eb,
+    "dark green": 0x257203,
+    "light blue": 0x87CEFA,
+    "brown": 0x8B4513,
+    "black": 0x000000,
+    "green": 0x008000,
+    "light green": 0x90EE90,
+    "dark blue": 0x00008B,
+    "light yellow": 0xFFFFE0,
+    "dark red": 0x8B0000
+};
+
+for (var colorName in colors) {
+    var color = colors[colorName];
+    basicMaterials[colorName] = new THREE.MeshBasicMaterial({ color: color });
+    cartoonMaterials[colorName] = new THREE.MeshToonMaterial({ color: color });
+    gouraudMaterials[colorName] = new THREE.MeshLambertMaterial({ color: color });
+    phongMaterials[colorName] = new THREE.MeshPhongMaterial({ color: color });
 }
 
 var materials = {
-	'dark grey basic': new THREE.MeshBasicMaterial({ color: colors['dark grey'], wireframe: true }),
-	'purple basic': new THREE.MeshBasicMaterial({ color: colors['purple'], wireframe: true }),
-	'orange basic': new THREE.MeshBasicMaterial({ color: colors['orange'], wireframe: true }),
-	'red basic': new THREE.MeshBasicMaterial({ color: colors['red'], wireframe: true }),
-	'dark green phong': new THREE.MeshPhongMaterial({ color: colors['dark green'] }),
-	'orange phong': new THREE.MeshPhongMaterial({ color: colors['orange'] }),
-	'purple gouraud': new THREE.MeshLambertMaterial({ color: colors['purple'] }),
-	'red gouraud': new THREE.MeshLambertMaterial({ color: colors['red'] }),
-	'blue cartoon': new THREE.MeshToonMaterial({ color: colors['blue'] }),
 	'normalMap': new THREE.MeshNormalMaterial(),
 };
 
@@ -133,13 +138,8 @@ function createObjects() {
 	createDirectionalLight();
 	createAmbientLight();
 
-	// Create a cube and add it to the scene
-	geometry = new THREE.BoxGeometry(1, 1, 1);
-	material = materials['phong']
-	mesh = new THREE.Mesh(geometry, material);
-	objects.push(mesh);
-	scene.add(mesh);
 }
+
 function createCarousel(x, y, z) {
 	'use strict';
 	carousel = new THREE.Object3D();
@@ -161,7 +161,7 @@ function createCylBase(obj, x, y, z) {
 	'use strict';
 
 	cylBaseGeometry = new THREE.CylinderGeometry(10, 10, 60, 30);
-	cylBaseMesh = new THREE.Mesh(cylBaseGeometry, materials["purple gouraud"]);
+	cylBaseMesh = new THREE.Mesh(cylBaseGeometry, gouraudMaterials["dark grey"]);
 
 	cylBaseMesh.position.set(x, y, z);
 
@@ -188,17 +188,17 @@ function createRing1(obj, x, y, z) {
 	};
 
 	ring1HeightGeometry = new THREE.ExtrudeGeometry(ringShape, extrudeSettings);
-	ring1HeightMesh = new THREE.Mesh(ring1HeightGeometry, materials["blue cartoon"]);
+	ring1HeightMesh = new THREE.Mesh(ring1HeightGeometry, cartoonMaterials["blue"]);
 	ring1HeightMesh.rotation.x = Math.PI / 2;
 	ring1HeightMesh.position.set(x, y, z);
 
 	ring1UpGeometry = new THREE.RingGeometry(10, 20, 30);
-	ring1UpMesh = new THREE.Mesh(ring1UpGeometry, materials["blue cartoon"]);
+	ring1UpMesh = new THREE.Mesh(ring1UpGeometry, cartoonMaterials["blue"]);
 	ring1UpMesh.rotation.x = Math.PI / 2;
 	ring1UpMesh.position.set(x, y, z);
 
 	ring1DownGeometry = new THREE.RingGeometry(10, 20, 30);
-	ring1DownMesh = new THREE.Mesh(ring1DownGeometry, materials["blue cartoon"]);
+	ring1DownMesh = new THREE.Mesh(ring1DownGeometry, cartoonMaterials["blue"]);
 	ring1DownMesh.rotation.x = Math.PI / 2;
 	ring1DownMesh.position.set(x, y - 10, z);
 
@@ -243,17 +243,17 @@ function createRing2(obj, x, y, z) {
 	};
 
 	ring2HeightGeometry = new THREE.ExtrudeGeometry(ringShape, extrudeSettings);
-	ring2HeightMesh = new THREE.Mesh(ring2HeightGeometry, materials["dark green phong"]);
+	ring2HeightMesh = new THREE.Mesh(ring2HeightGeometry, phongMaterials["dark green"]);
 	ring2HeightMesh.rotation.x = Math.PI / 2;
 	ring2HeightMesh.position.set(x, y, z);
 
 	ring2UpGeometry = new THREE.RingGeometry(20, 30, 30);
-	ring2UpMesh = new THREE.Mesh(ring2UpGeometry, materials["dark green phong"]);
+	ring2UpMesh = new THREE.Mesh(ring2UpGeometry, phongMaterials["dark green"]);
 	ring2UpMesh.rotation.x = Math.PI / 2;
 	ring2UpMesh.position.set(x, y, z);
 
 	ring2DownGeometry = new THREE.RingGeometry(20, 30, 30);
-	ring2DownMesh = new THREE.Mesh(ring2DownGeometry, materials["dark green phong"]);
+	ring2DownMesh = new THREE.Mesh(ring2DownGeometry, phongMaterials["dark green"]);
 	ring2DownMesh.rotation.x = Math.PI / 2;
 	ring2DownMesh.position.set(x, y - 10, z);
 
@@ -297,17 +297,17 @@ function createRing3(obj, x, y, z) {
 	};
 
 	ring3HeightGeometry = new THREE.ExtrudeGeometry(ringShape, extrudeSettings);
-	ring3HeightMesh = new THREE.Mesh(ring3HeightGeometry, materials["red basic"]);
+	ring3HeightMesh = new THREE.Mesh(ring3HeightGeometry, basicMaterials["red"]);
 	ring3HeightMesh.rotation.x = Math.PI / 2;
 	ring3HeightMesh.position.set(x, y, z);
 
 	ring3UpGeometry = new THREE.RingGeometry(30, 40, 100);
-	ring3UpMesh = new THREE.Mesh(ring3UpGeometry, materials["red basic"]);
+	ring3UpMesh = new THREE.Mesh(ring3UpGeometry, basicMaterials["red"]);
 	ring3UpMesh.rotation.x = Math.PI / 2;
 	ring3UpMesh.position.set(x, y, z);
 
 	ring3DownGeometry = new THREE.RingGeometry(30, 40, 100);
-	ring3DownMesh = new THREE.Mesh(ring3DownGeometry, materials["red basic"]);
+	ring3DownMesh = new THREE.Mesh(ring3DownGeometry, basicMaterials["red"]);
 	ring3DownMesh.rotation.x = Math.PI / 2;
 	ring3DownMesh.position.set(x, y - 10, z);
 
@@ -348,7 +348,7 @@ function createParametric1(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par1R1Geometry = new ParametricGeometry(customFunction, 25, 25);
-		par1R1Mesh = new THREE.Mesh(par1R1Geometry, materials["orange basic"]);
+		par1R1Mesh = new THREE.Mesh(par1R1Geometry, basicMaterials["yellow"]);
 		par1R1Mesh.position.set(x + 15, y, z);
 
 		obj.add(par1R1Mesh);
@@ -357,7 +357,7 @@ function createParametric1(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par1R2Geometry = new ParametricGeometry(customFunction, 25, 25);
-		par1R2Mesh = new THREE.Mesh(par1R2Geometry, materials["orange basic"]);
+		par1R2Mesh = new THREE.Mesh(par1R2Geometry, basicMaterials["orange"]);
 		par1R2Mesh.position.set(x + 15, y, z);
 
 		obj.add(par1R2Mesh);
@@ -366,7 +366,7 @@ function createParametric1(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par1R3Geometry = new ParametricGeometry(customFunction, 25, 25);
-		par1R3Mesh = new THREE.Mesh(par1R3Geometry, materials["orange basic"]);
+		par1R3Mesh = new THREE.Mesh(par1R3Geometry, basicMaterials["red"]);
 		par1R3Mesh.position.set(x + 15, y, z);
 
 		obj.add(par1R3Mesh);
@@ -402,7 +402,7 @@ function createParametric2(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par2R1Geometry = new ParametricGeometry(functionKlein, 30, 30);
-		par2R1Mesh = new THREE.Mesh(par2R1Geometry, materials["orange basic"]);
+		par2R1Mesh = new THREE.Mesh(par2R1Geometry, phongMaterials["light blue"]);
 		par2R1Mesh.position.set(x + 11, y + 1.5, z - 11);
 
 		obj.add(par2R1Mesh);
@@ -411,7 +411,7 @@ function createParametric2(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par2R2Geometry = new ParametricGeometry(functionKlein, 30, 30);
-		par2R2Mesh = new THREE.Mesh(par2R2Geometry, materials["orange basic"]);
+		par2R2Mesh = new THREE.Mesh(par2R2Geometry, phongMaterials["orange"]);
 		par2R2Mesh.position.set(x + 11, y + 1.5, z - 11);
 
 		obj.add(par2R2Mesh);
@@ -420,7 +420,7 @@ function createParametric2(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par2R3Geometry = new ParametricGeometry(functionKlein, 30, 30);
-		par2R3Mesh = new THREE.Mesh(par2R3Geometry, materials["orange basic"]);
+		par2R3Mesh = new THREE.Mesh(par2R3Geometry, phongMaterials["dark green"]);
 		par2R3Mesh.position.set(x + 11, y + 1.5, z - 11);
 
 		obj.add(par2R3Mesh);
@@ -452,7 +452,7 @@ function createParametric3(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par3R1Geometry = new ParametricGeometry(functionP, 30, 30);
-		par3R1Mesh = new THREE.Mesh(par3R1Geometry, materials["orange basic"]);
+		par3R1Mesh = new THREE.Mesh(par3R1Geometry, gouraudMaterials["dark blue"]);
 		par3R1Mesh.position.set(x, y, z - 15);
 
 		obj.add(par3R1Mesh);
@@ -461,20 +461,20 @@ function createParametric3(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par3R2Geometry = new ParametricGeometry(functionP, 30, 30);
-		par3R2Mesh = new THREE.Mesh(par3R2Geometry, materials["orange basic"]);
+		par3R2Mesh = new THREE.Mesh(par3R2Geometry, gouraudMaterials["purple"]);
 		par3R2Mesh.position.set(x, y, z - 15);
 
 		obj.add(par3R2Mesh);
-		objects.push(par2R2Mesh);
+		objects.push(par3R2Mesh);
 		parametricMeshes.push(par3R2Mesh);
 	}
 	if (obj == ring3) {
 		par3R3Geometry = new ParametricGeometry(functionP, 30, 30);
-		par3R3Mesh = new THREE.Mesh(par3R3Geometry, materials["orange basic"]);
+		par3R3Mesh = new THREE.Mesh(par3R3Geometry, gouraudMaterials["red"]);
 		par3R3Mesh.position.set(x, y, z - 15);
 
 		obj.add(par3R3Mesh);
-		objects.push(par2R3Mesh);
+		objects.push(par3R3Mesh);
 		parametricMeshes.push(par3R3Mesh);
 	}
 }
@@ -502,7 +502,7 @@ function createParametric4(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par4R1Geometry = new ParametricGeometry(functionP, 32, 32);
-		par4R1Mesh = new THREE.Mesh(par4R1Geometry, materials["orange basic"]);
+		par4R1Mesh = new THREE.Mesh(par4R1Geometry, materials["normalMap"]);
 		par4R1Mesh.position.set(x - 11, y + 3.2, z - 11);
 
 		obj.add(par4R1Mesh);
@@ -511,7 +511,7 @@ function createParametric4(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par4R2Geometry = new ParametricGeometry(functionP, 32, 32);
-		par4R2Mesh = new THREE.Mesh(par4R2Geometry, materials["orange basic"]);
+		par4R2Mesh = new THREE.Mesh(par4R2Geometry, materials["normalMap"]);
 		par4R2Mesh.position.set(x - 11, y + 3.2, z - 11);
 
 		obj.add(par4R2Mesh);
@@ -520,7 +520,7 @@ function createParametric4(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par4R3Geometry = new ParametricGeometry(functionP, 32, 32);
-		par4R3Mesh = new THREE.Mesh(par4R3Geometry, materials["orange basic"]);
+		par4R3Mesh = new THREE.Mesh(par4R3Geometry, materials["normalMap"]);
 		par4R3Mesh.position.set(x - 11, y + 3.2, z - 11);
 
 		obj.add(par4R3Mesh);
@@ -543,7 +543,7 @@ function createParametric5(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par5R1Geometry = new ParametricGeometry(functionP, 32, 32);
-		par5R1Mesh = new THREE.Mesh(par5R1Geometry, materials["orange basic"]);
+		par5R1Mesh = new THREE.Mesh(par5R1Geometry, cartoonMaterials["orange"]);
 		par5R1Mesh.position.set(x - 15, y + 2, z);
 
 		obj.add(par5R1Mesh);
@@ -552,7 +552,7 @@ function createParametric5(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par5R2Geometry = new ParametricGeometry(functionP, 32, 32);
-		par5R2Mesh = new THREE.Mesh(par5R2Geometry, materials["orange basic"]);
+		par5R2Mesh = new THREE.Mesh(par5R2Geometry, cartoonMaterials["black"]);
 		par5R2Mesh.position.set(x - 15, y + 2, z);
 
 		obj.add(par5R2Mesh);
@@ -561,7 +561,7 @@ function createParametric5(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par5R3Geometry = new ParametricGeometry(functionP, 32, 32);
-		par5R3Mesh = new THREE.Mesh(par5R3Geometry, materials["orange basic"]);
+		par5R3Mesh = new THREE.Mesh(par5R3Geometry, cartoonMaterials["purple"]);
 		par5R3Mesh.position.set(x - 15, y + 2, z);
 
 		obj.add(par5R3Mesh);
@@ -589,7 +589,7 @@ function createParametric6(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par6R1Geometry = new ParametricGeometry(functionP, 32, 32);
-		par6R1Mesh = new THREE.Mesh(par6R1Geometry, materials["orange phong"]);
+		par6R1Mesh = new THREE.Mesh(par6R1Geometry, materials["normalMap"]);
 		par6R1Mesh.position.set(x - 11, y + 2.5, z + 11);
 
 		obj.add(par6R1Mesh);
@@ -598,7 +598,7 @@ function createParametric6(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par6R2Geometry = new ParametricGeometry(functionP, 32, 32);
-		par6R2Mesh = new THREE.Mesh(par6R2Geometry, materials["orange phong"]);
+		par6R2Mesh = new THREE.Mesh(par6R2Geometry, materials["normalMap"]);
 		par6R2Mesh.position.set(x - 11, y + 2.5, z + 11);
 
 		obj.add(par6R2Mesh);
@@ -607,7 +607,7 @@ function createParametric6(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par6R3Geometry = new ParametricGeometry(functionP, 32, 32);
-		par6R3Mesh = new THREE.Mesh(par6R3Geometry, materials["orange phong"]);
+		par6R3Mesh = new THREE.Mesh(par6R3Geometry, materials["normalMap"]);
 		par6R3Mesh.position.set(x - 11, y + 2.5, z + 11);
 
 		obj.add(par6R3Mesh);
@@ -647,7 +647,7 @@ function createParametric7(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par7R1Geometry = new ParametricGeometry(functionP, 32, 32);
-		par7R1Mesh = new THREE.Mesh(par7R1Geometry, materials["orange basic"]);
+		par7R1Mesh = new THREE.Mesh(par7R1Geometry, phongMaterials["light yellow"]);
 		par7R1Mesh.position.set(x, y + 1.3, z + 15);
 
 		obj.add(par7R1Mesh);
@@ -656,7 +656,7 @@ function createParametric7(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par7R2Geometry = new ParametricGeometry(functionP, 32, 32);
-		par7R2Mesh = new THREE.Mesh(par7R2Geometry, materials["orange basic"]);
+		par7R2Mesh = new THREE.Mesh(par7R2Geometry, phongMaterials["dark blue"]);
 		par7R2Mesh.position.set(x, y + 1.3, z + 15);
 
 		obj.add(par7R2Mesh);
@@ -665,7 +665,7 @@ function createParametric7(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par7R3Geometry = new ParametricGeometry(functionP, 32, 32);
-		par7R3Mesh = new THREE.Mesh(par7R3Geometry, materials["orange basic"]);
+		par7R3Mesh = new THREE.Mesh(par7R3Geometry, phongMaterials["red"]);
 		par7R3Mesh.position.set(x, y + 1.3, z + 15);
 
 		obj.add(par7R3Mesh);
@@ -693,7 +693,7 @@ function createParametric8(obj, x, y, z) {
 	}
 	if (obj == ring1) {
 		par8R1Geometry = new ParametricGeometry(functionP, 32, 32);
-		par8R1Mesh = new THREE.Mesh(par8R1Geometry, materials["orange basic"]);
+		par8R1Mesh = new THREE.Mesh(par8R1Geometry, gouraudMaterials["dark green"]);
 		par8R1Mesh.position.set(x + 11, y + 3.3, z + 11);
 
 		obj.add(par8R1Mesh);
@@ -702,7 +702,7 @@ function createParametric8(obj, x, y, z) {
 	}
 	if (obj == ring2) {
 		par8R2Geometry = new ParametricGeometry(functionP, 32, 32);
-		par8R2Mesh = new THREE.Mesh(par8R2Geometry, materials["orange basic"]);
+		par8R2Mesh = new THREE.Mesh(par8R2Geometry, gouraudMaterials["green"]);
 		par8R2Mesh.position.set(x + 11, y + 3.3, z + 11);
 
 		obj.add(par8R2Mesh);
@@ -711,7 +711,7 @@ function createParametric8(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par8R3Geometry = new ParametricGeometry(functionP, 32, 32);
-		par8R3Mesh = new THREE.Mesh(par8R3Geometry, materials["orange basic"]);
+		par8R3Mesh = new THREE.Mesh(par8R3Geometry, gouraudMaterials["orange"]);
 		par8R3Mesh.position.set(x + 11, y + 3.3, z + 11);
 
 		obj.add(par8R3Mesh);
@@ -759,22 +759,52 @@ function update() {
 
 	if (GouraudActive) {
 		for (var i = 0; i < objects.length; i++) {
-			objects[i].material = materials["gouraud"];
-		}
+            // Get an array of the color names
+            var colorNames = Object.keys(gouraudMaterials);
+
+            // Select a random color name
+            var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+            
+            // Use the random color name to access a random material
+            var randomMaterial = gouraudMaterials[randomColorName];
+    
+            // Assign the random material to the object
+            objects[i].material = randomMaterial;
+        }
 		GouraudActive = false;
 	}
 
 	if (PhongActive) {
 		for (var i = 0; i < objects.length; i++) {
-			objects[i].material = materials["phong"];
-		}
+            // Get an array of the color names
+            var colorNames = Object.keys(gouraudMaterials);
+
+            // Select a random color name
+            var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+            
+            // Use the random color name to access a random material
+            var randomMaterial = phongMaterials[randomColorName];
+    
+            // Assign the random material to the object
+            objects[i].material = randomMaterial;
+        }
 		PhongActive = false;
 	}
 
 	if (CartoonActive) {
 		for (var i = 0; i < objects.length; i++) {
-			objects[i].material = materials["cartoon"];
-		}
+            // Get an array of the color names
+            var colorNames = Object.keys(gouraudMaterials);
+
+            // Select a random color name
+            var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+            
+            // Use the random color name to access a random material
+            var randomMaterial = cartoonMaterials[randomColorName];
+    
+            // Assign the random material to the object
+            objects[i].material = randomMaterial;
+        }
 		CartoonActive = false;
 	}
 
@@ -796,15 +826,23 @@ function update() {
 		else {
 			for (var i = 0; i < objects.length; i++) {
 				originalMaterials[i] = objects[i].material;
-				objects[i].material = materials["basic"];
+
+				// Get an array of the color names
+                var colorNames = Object.keys(gouraudMaterials);
+
+                // Select a random color name
+                var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+                
+                // Use the random color name to access a random material
+                var randomMaterial = basicMaterials[randomColorName];
+        
+                // Assign the random material to the object
+                objects[i].material = randomMaterial;
 			}
 			BasicActive = true;
 		}
-
 		toggleBasic = false;
 	}
-
-
 }
 
 /////////////
@@ -825,11 +863,13 @@ function init() {
 	renderer = new THREE.WebGLRenderer({
 		antialias: true,
 	});
+
+    renderer.setPixelRatio(window.devicePixelRatio)
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
-	document.body.appendChild(VRButton.createButton(renderer));
 	renderer.xr.enabled = true;
+    document.body.appendChild(VRButton.createButton(renderer));
 
 	createScene();
 	createCamera();
@@ -857,7 +897,8 @@ function animate() {
 
 	});
 
-	requestAnimationFrame(animate);
+	// requestAnimationFrame(animate);
+    renderer.setAnimationLoop(animate);
 }
 
 ////////////////////////////
