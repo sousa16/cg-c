@@ -37,9 +37,11 @@ var par1R1Geometry, par1R1Mesh, par2R1Geometry, par2R1Mesh, par3R1Geometry, par3
 var par1R2Geometry, par1R2Mesh, par2R2Geometry, par2R2Mesh, par3R2Geometry, par3R2Mesh, par4R2Geometry, par4R2Mesh, par5R2Geometry, par5R2Mesh, par6R2Geometry, par6R2Mesh, par7R2Geometry, par7R2Mesh, par8R2Geometry, par8R2Mesh;
 var par1R3Geometry, par1R3Mesh, par2R3Geometry, par2R3Mesh, par3R3Geometry, par3R3Mesh, par4R3Geometry, par4R3Mesh, par5R3Geometry, par5R3Mesh, par6R3Geometry, par6R3Mesh, par7R3Geometry, par7R3Mesh, par8R3Geometry, par8R3Mesh;
 
-var mov1 = true;
 
-var keys;
+var direction1 = 1;
+var direction2 = 1;
+var direction3 = 1;
+
 var key1 = false;
 var key2 = false;
 var key3 = false;
@@ -285,8 +287,8 @@ function createRing3(obj, x, y, z) {
 
 	var ringShape = new THREE.Shape();
 	ringShape.moveTo(30, 0);
-	ringShape.absarc(0, 0, 10, 0, Math.PI * 2, false);
-	ringShape.moveTo(30, 0);
+	ringShape.absarc(0, 0, 30, 0, Math.PI * 2, false);
+	ringShape.moveTo(40, 0);
 	ringShape.absarc(0, 0, 40, 0, Math.PI * 2, true);
 
 
@@ -803,8 +805,16 @@ function update() {
 	'use strict';
 	var delta = clock.getDelta();
 	if (key1) {
-		moveUpRing1(1, delta);
-
+		moveRing(ring1, direction1, delta);
+		checkBoundariesRing1();
+	}
+	if (key2) {
+		moveRing(ring2, direction2, delta);
+		checkBoundariesRing2();
+	}
+	if (key3) {
+		moveRing(ring3, direction3, delta);
+		checkBoundariesRing3();
 	}
 
 	carousel.rotation.y += 0.01;
@@ -980,13 +990,36 @@ function onResize() {
 //////////////////////////////
 /* CRANE MOVEMENT FUNCTIONS */
 //////////////////////////////
-
-function moveUpRing1(direction, delta) {
-	ring1.position.y += direction * 8 * delta;
+function moveRing(object, direction, delta) {
+	object.position.y += direction * 8 * delta;
 }
 
-function moveDownRing1(direction, delta) {
-	ring1.position.y += direction * 8 * delta;
+function checkBoundariesRing1() {
+	if (ring1.position.y >= 53) {
+		ring1.position.y = 53;
+		direction1 = -1;
+	} else if (ring1.position.y <= 7) {
+		ring1.position.y = 7;
+		direction1 = 1;
+	}
+}
+function checkBoundariesRing2() {
+	if (ring2.position.y >= 53) {
+		ring2.position.y = 53;
+		direction2 = -1;
+	} else if (ring2.position.y <= 7) {
+		ring2.position.y = 7;
+		direction2 = 1;
+	}
+}
+function checkBoundariesRing3() {
+	if (ring3.position.y >= 53) {
+		ring3.position.y = 53;
+		direction3 = -1;
+	} else if (ring3.position.y <= 7) {
+		ring3.position.y = 7;
+		direction3 = 1;
+	}
 }
 
 ///////////////////////
