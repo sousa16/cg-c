@@ -37,43 +37,49 @@ var par1R1Geometry, par1R1Mesh, par2R1Geometry, par2R1Mesh, par3R1Geometry, par3
 var par1R2Geometry, par1R2Mesh, par2R2Geometry, par2R2Mesh, par3R2Geometry, par3R2Mesh, par4R2Geometry, par4R2Mesh, par5R2Geometry, par5R2Mesh, par6R2Geometry, par6R2Mesh, par7R2Geometry, par7R2Mesh, par8R2Geometry, par8R2Mesh;
 var par1R3Geometry, par1R3Mesh, par2R3Geometry, par2R3Mesh, par3R3Geometry, par3R3Mesh, par4R3Geometry, par4R3Mesh, par5R3Geometry, par5R3Mesh, par6R3Geometry, par6R3Mesh, par7R3Geometry, par7R3Mesh, par8R3Geometry, par8R3Mesh;
 
+var mobiusGeometry, mobiusMesh;
+var skydomeGeometry, skydomeMesh, skydomeMaterial;
+
+var parametricRotations = [];
+var parametricSpotlights = [];
 
 var direction1 = 1;
 var direction2 = 1;
 var direction3 = 1;
 
-var key1 = false;
-var key2 = false;
-var key3 = false;
+var key1 = true;
+var key2 = true;
+var key3 = true;
+var spotlights = true;
 
 var clock = new THREE.Clock();
 
 var colors = {
-    "dark grey": 0x444745,
-    "white": 0xffffff,
-    "yellow": 0xffd700,
-    "red": 0xd71b12,
-    "pink": 0xf757d7,
-    "blue": 0x0b0fd3,
-    "orange": 0xeb6900,
-    "purple": 0x9000eb,
-    "dark green": 0x257203,
-    "light blue": 0x87CEFA,
-    "brown": 0x8B4513,
-    "black": 0x000000,
-    "green": 0x008000,
-    "light green": 0x90EE90,
-    "dark blue": 0x00008B,
-    "light yellow": 0xFFFFE0,
-    "dark red": 0x8B0000
+	"dark grey": 0x444745,
+	"white": 0xffffff,
+	"yellow": 0xffd700,
+	"red": 0xd71b12,
+	"pink": 0xf757d7,
+	"blue": 0x0b0fd3,
+	"orange": 0xeb6900,
+	"purple": 0x9000eb,
+	"dark green": 0x257203,
+	"light blue": 0x87CEFA,
+	"brown": 0x8B4513,
+	"black": 0x000000,
+	"green": 0x008000,
+	"light green": 0x90EE90,
+	"dark blue": 0x00008B,
+	"light yellow": 0xFFFFE0,
+	"dark red": 0x8B0000
 };
 
 for (var colorName in colors) {
-    var color = colors[colorName];
-    basicMaterials[colorName] = new THREE.MeshBasicMaterial({ color: color });
-    cartoonMaterials[colorName] = new THREE.MeshToonMaterial({ color: color });
-    gouraudMaterials[colorName] = new THREE.MeshLambertMaterial({ color: color });
-    phongMaterials[colorName] = new THREE.MeshPhongMaterial({ color: color });
+	var color = colors[colorName];
+	basicMaterials[colorName] = new THREE.MeshBasicMaterial({ color: color });
+	cartoonMaterials[colorName] = new THREE.MeshToonMaterial({ color: color });
+	gouraudMaterials[colorName] = new THREE.MeshLambertMaterial({ color: color });
+	phongMaterials[colorName] = new THREE.MeshPhongMaterial({ color: color });
 }
 
 var materials = {
@@ -87,9 +93,10 @@ function createScene() {
 	'use strict';
 
 	scene = new THREE.Scene();
-	scene.add(new THREE.AxesHelper(20));
+	scene.add(new THREE.AxesHelper(10));
 
 	createCarousel(0, 0, 0);
+	createSkydome();
 }
 
 //////////////////////
@@ -116,7 +123,7 @@ function createCamera() {
 
 function createDirectionalLight() {
 	"use strict";
-	directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+	directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 
 	directionalLight.position.set(-20, 20, 20);
 	directionalLight.target = scene;
@@ -126,8 +133,8 @@ function createDirectionalLight() {
 
 function createAmbientLight() {
 	"use strict";
-	ambientLight = new THREE.AmbientLight(0xFFA500, 0.2);
-	ambientLight.position.set(-10, 22, 0);
+	ambientLight = new THREE.AmbientLight(0xFFA500, 0.1);
+	ambientLight.position.set(-10, 55, 0);
 
 	scene.add(ambientLight);
 }
@@ -139,9 +146,17 @@ function createAmbientLight() {
 function createObjects() {
 	createDirectionalLight();
 	createAmbientLight();
-
 }
 
+function createSkydome() {
+	'use strict';
+	skydomeGeometry = new THREE.SphereGeometry(100, 124, 32, 0, Math.PI * 2, 0, 1.75);
+	let map = new THREE.TextureLoader().load("./textures/skydome1.png");
+	skydomeMaterial = new THREE.MeshPhongMaterial({ map: map, side: THREE.DoubleSide })
+	skydomeMesh = new THREE.Mesh(skydomeGeometry, skydomeMaterial);
+	skydomeMesh.position.set(0, 40, 0);
+	scene.add(skydomeMesh);
+}
 function createCarousel(x, y, z) {
 	'use strict';
 	carousel = new THREE.Object3D();
@@ -150,6 +165,7 @@ function createCarousel(x, y, z) {
 	createRing1(carousel, x, y + 5, z);
 	createRing2(carousel, x, y + 5, z);
 	createRing3(carousel, x, y + 5, z);
+	createMobiusStrip(carousel, x, y + 70, z);
 
 	carousel.position.x = x;
 	carousel.position.y = y;
@@ -214,6 +230,7 @@ function createRing1(obj, x, y, z) {
 
 	ring1.position.set(0, 45, 0);
 
+	y += 2.5;
 	createParametric1(ring1, x, y, z);
 	createParametric2(ring1, x, y, z);
 	createParametric3(ring1, x, y, z);
@@ -269,6 +286,7 @@ function createRing2(obj, x, y, z) {
 
 	ring2.position.set(0, 35, 0);
 
+	y += 2.5;
 	createParametric1(ring2, x + 10, y, z);
 	createParametric2(ring2, x + 7, y, z - 7);
 	createParametric3(ring2, x, y, z - 10);
@@ -323,6 +341,7 @@ function createRing3(obj, x, y, z) {
 
 	ring3.position.set(0, 25, 0);
 
+	y += 2.5;
 	createParametric1(ring3, x + 20, y, z);
 	createParametric2(ring3, x + 14, y, z - 14);
 	createParametric3(ring3, x, y, z - 20);
@@ -348,6 +367,9 @@ function createParametric1(obj, x, y, z) {
 		var z = Math.sin(u * Math.PI) * Math.cos(v * Math.PI) * 1.5;
 		vector.set(x - 1.5, y, z);
 	}
+
+	var spotlight = new THREE.SpotLight(0xffffff, 1);
+
 	if (obj == ring1) {
 		par1R1Geometry = new ParametricGeometry(customFunction, 25, 25);
 		par1R1Mesh = new THREE.Mesh(par1R1Geometry, basicMaterials["yellow"]);
@@ -356,6 +378,7 @@ function createParametric1(obj, x, y, z) {
 		obj.add(par1R1Mesh);
 		objects.push(par1R1Mesh);
 		parametricMeshes.push(par1R1Mesh);
+
 	}
 	if (obj == ring2) {
 		par1R2Geometry = new ParametricGeometry(customFunction, 25, 25);
@@ -368,13 +391,19 @@ function createParametric1(obj, x, y, z) {
 	}
 	if (obj == ring3) {
 		par1R3Geometry = new ParametricGeometry(customFunction, 25, 25);
-		par1R3Mesh = new THREE.Mesh(par1R3Geometry, basicMaterials["orange"]);
+		par1R3Mesh = new THREE.Mesh(par1R3Geometry, basicMaterials["dark green"]);
 		par1R3Mesh.position.set(x + 15, y, z);
 
 		obj.add(par1R3Mesh);
 		objects.push(par1R3Mesh);
 		parametricMeshes.push(par1R3Mesh);
 	}
+
+	spotlight.position.set(x + 15, y + 5, z);
+	spotlight.target = par1R1Mesh;
+	obj.add(spotlight);
+	console.log(spotlight);
+	parametricSpotlights.push(spotlight);
 }
 
 function createParametric2(obj, x, y, z) {
@@ -435,37 +464,37 @@ function createParametric3(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-        var radius = 2;
-        var height = 4;
+		var radius = 2;
+		var height = 4;
 
-        var xpos, ypos, zpos;
+		var xpos, ypos, zpos;
 
-        if (v < 0.05) { // Cylinder base
-            var r = radius * (v / 0.05);
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = -height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else if (v > 0.95) { // Cylinder top
-            var r = radius * ((1 - v) / 0.05);
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else { // Cylinder boddy
-            var theta = u * 2 * Math.PI;
-            xpos = radius * Math.cos(theta);
-            ypos = v * height - height / 2;
-            zpos = radius * Math.sin(theta);
-        }
+		if (v < 0.05) { // Cylinder base
+			var r = radius * (v / 0.05);
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = -height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else if (v > 0.95) { // Cylinder top
+			var r = radius * ((1 - v) / 0.05);
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else { // Cylinder boddy
+			var theta = u * 2 * Math.PI;
+			xpos = radius * Math.cos(theta);
+			ypos = v * height - height / 2;
+			zpos = radius * Math.sin(theta);
+		}
 
-        // Cylinder rotation
-        var angle = Math.PI / 6;
-        var cosAngle = Math.cos(angle);
-        var sinAngle = Math.sin(angle);
+		// Cylinder rotation
+		var angle = Math.PI / 6;
+		var cosAngle = Math.cos(angle);
+		var sinAngle = Math.sin(angle);
 
-        var xRot = xpos * cosAngle - ypos * sinAngle;
-        var yRot = xpos * sinAngle + ypos * cosAngle;
+		var xRot = xpos * cosAngle - ypos * sinAngle;
+		var yRot = xpos * sinAngle + ypos * cosAngle;
 
-        vector.set(xRot, yRot + 3, zpos);
+		vector.set(xRot, yRot + 3, zpos);
 	}
 	if (obj == ring1) {
 		par3R1Geometry = new ParametricGeometry(functionP, 30, 30);
@@ -500,32 +529,32 @@ function createParametric4(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-        var radius = 3;
-        var height = 5;
+		var radius = 3;
+		var height = 5;
 
-        var xpos, ypos, zpos;
+		var xpos, ypos, zpos;
 
-        if (v < 0.05) { // cone base
-            var r = radius * (v / 0.05);
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = -height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else { // cone boddy
-            var theta = u * 2 * Math.PI;
-            var r = (1 - v) * radius;
-            xpos = r * Math.cos(theta);
-            ypos = v * height - height / 2;
-            zpos = r * Math.sin(theta);
-        }
+		if (v < 0.05) { // cone base
+			var r = radius * (v / 0.05);
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = -height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else { // cone boddy
+			var theta = u * 2 * Math.PI;
+			var r = (1 - v) * radius;
+			xpos = r * Math.cos(theta);
+			ypos = v * height - height / 2;
+			zpos = r * Math.sin(theta);
+		}
 
-        // cone rotation
-        var angle = Math.PI / 12;
-        var cosAngle = Math.cos(angle);
-        var sinAngle = Math.sin(angle);
-        var xRot = xpos * cosAngle - ypos * sinAngle;
-        var yRot = xpos * sinAngle + ypos * cosAngle;
+		// cone rotation
+		var angle = Math.PI / 12;
+		var cosAngle = Math.cos(angle);
+		var sinAngle = Math.sin(angle);
+		var xRot = xpos * cosAngle - ypos * sinAngle;
+		var yRot = xpos * sinAngle + ypos * cosAngle;
 
-        vector.set(xRot, yRot, zpos);
+		vector.set(xRot, yRot, zpos);
 	}
 	if (obj == ring1) {
 		par4R1Geometry = new ParametricGeometry(functionP, 32, 32);
@@ -560,30 +589,30 @@ function createParametric5(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-        var baseRadius = 2;
-        var topRadius = 1;
-        var height = 4;
+		var baseRadius = 2;
+		var topRadius = 1;
+		var height = 4;
 
-        var xpos, ypos, zpos;
+		var xpos, ypos, zpos;
 
-        if (v < 0.05) { // base
-            var r = baseRadius * v;
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = -height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else if (v > 0.95) { // top
-            var r = topRadius * ((1 - v) / 0.05);
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else { // boddy
-            var blendRadius = baseRadius - (baseRadius - topRadius) * (v - 0.05) / 0.9;
-            xpos = blendRadius * Math.cos(u * 2 * Math.PI);
-            ypos = v * height - height / 2;
-            zpos = blendRadius * Math.sin(u * 2 * Math.PI);
-        }
+		if (v < 0.05) { // base
+			var r = baseRadius * v;
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = -height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else if (v > 0.95) { // top
+			var r = topRadius * ((1 - v) / 0.05);
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else { // boddy
+			var blendRadius = baseRadius - (baseRadius - topRadius) * (v - 0.05) / 0.9;
+			xpos = blendRadius * Math.cos(u * 2 * Math.PI);
+			ypos = v * height - height / 2;
+			zpos = blendRadius * Math.sin(u * 2 * Math.PI);
+		}
 
-        vector.set(xpos, ypos, zpos);
+		vector.set(xpos, ypos, zpos);
 	}
 	if (obj == ring1) {
 		par5R1Geometry = new ParametricGeometry(functionP, 25, 25);
@@ -722,36 +751,36 @@ function createParametric8(obj, x, y, z) {
 	'use strict';
 
 	function functionP(u, v, vector) {
-        var baseRadius = 1;
-        var topRadius = 3;
-        var height = 5;
+		var baseRadius = 1;
+		var topRadius = 3;
+		var height = 5;
 
-        var xpos, ypos, zpos;
+		var xpos, ypos, zpos;
 
-        if (v < 0.05) { // base
-            var r = baseRadius * v;
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = -height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else if (v > 0.95) { // top
-            var r = topRadius * ((1 - v) / 0.05);
-            xpos = r * Math.cos(u * 2 * Math.PI);
-            ypos = height / 2;
-            zpos = r * Math.sin(u * 2 * Math.PI);
-        } else { // boddy
-            var blendRadius = baseRadius - (baseRadius - topRadius) * (v - 0.05) / 0.9;
-            xpos = blendRadius * Math.cos(u * 2 * Math.PI);
-            ypos = v * height - height / 2;
-            zpos = blendRadius * Math.sin(u * 2 * Math.PI);
-        }
+		if (v < 0.05) { // base
+			var r = baseRadius * v;
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = -height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else if (v > 0.95) { // top
+			var r = topRadius * ((1 - v) / 0.05);
+			xpos = r * Math.cos(u * 2 * Math.PI);
+			ypos = height / 2;
+			zpos = r * Math.sin(u * 2 * Math.PI);
+		} else { // boddy
+			var blendRadius = baseRadius - (baseRadius - topRadius) * (v - 0.05) / 0.9;
+			xpos = blendRadius * Math.cos(u * 2 * Math.PI);
+			ypos = v * height - height / 2;
+			zpos = blendRadius * Math.sin(u * 2 * Math.PI);
+		}
 
-        // Inclinação do cilindro
-        var tiltAngle = Math.PI / 6; // Ângulo de inclinação (30 graus)
-        var newXpos = xpos;
-        var newZpos = zpos * Math.cos(tiltAngle) - ypos * Math.sin(tiltAngle);
-        ypos = zpos * Math.sin(tiltAngle) + ypos * Math.cos(tiltAngle);
+		// Inclinação do cilindro
+		var tiltAngle = Math.PI / 6; // Ângulo de inclinação (30 graus)
+		var newXpos = xpos;
+		var newZpos = zpos * Math.cos(tiltAngle) - ypos * Math.sin(tiltAngle);
+		ypos = zpos * Math.sin(tiltAngle) + ypos * Math.cos(tiltAngle);
 
-        vector.set(newXpos, ypos, newZpos);
+		vector.set(newXpos, ypos, newZpos);
 
 	}
 	if (obj == ring1) {
@@ -782,6 +811,64 @@ function createParametric8(obj, x, y, z) {
 		parametricMeshes.push(par8R3Mesh);
 	}
 }
+
+function createMobiusStrip(obj, x, y, z) {
+	'use strict';
+	const vertices = new Float32Array([
+		8, 0, 0,
+		12, 0, 0,
+		6.55, -0.62, 4.76,
+		9.63, 0.62, 7,
+		2.59, -1.18, 7.97,
+		3.59, 1.18, 11.05,
+		-2.73, -1.62, 8.4,
+		-3.45, 1.62, 10.63,
+		-7.59, -1.9, 5.51,
+		-8.59, 1.9, 6.24,
+		-10, -2, 1.22,
+		-10, 2, 0,
+		-8.59, -1.9, -6.24,
+		-7.59, 1.9, -5.51,
+		-3.45, -1.62, -10.63,
+		-2.73, 1.62, -8.4,
+		3.59, -1.18, -11.05,
+		2.59, 1.18, -7.97,
+		9.63, -0.62, -7,
+		6.55, 0.62, -4.76,
+	]);
+
+
+	const indices = [
+		0, 1, 3,
+		0, 3, 2,
+		2, 3, 5,
+		2, 5, 4,
+		4, 5, 7,
+		4, 7, 6,
+		6, 7, 9,
+		6, 9, 8,
+		8, 9, 11,
+		8, 11, 10,
+		10, 11, 13,
+		10, 13, 12,
+		12, 13, 15,
+		12, 15, 14,
+		14, 15, 17,
+		14, 17, 16,
+		16, 17, 19,
+		16, 19, 18,
+		18, 19, 1,
+		18, 1, 0,
+	];
+	mobiusGeometry = new THREE.BufferGeometry();
+	mobiusGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+	mobiusGeometry.setIndex(indices);
+	mobiusGeometry.computeVertexNormals();
+
+	mobiusMesh = new THREE.Mesh(mobiusGeometry, basicMaterials["green"]);
+	mobiusMesh.position.set(x, y, z);
+	obj.add(mobiusMesh)
+}
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
@@ -796,6 +883,30 @@ function checkCollisions() {
 function handleCollisions() {
 	'use strict';
 
+}
+
+function createRandomRotation() {
+	'use strict';
+
+	for (var i = 0; i < parametricMeshes.length; i++) {
+		var vector = []
+		var n = 0;
+		var x = Math.floor(Math.random() * 2);
+		var y = Math.floor(Math.random() * 2);
+		var z = Math.floor(Math.random() * 2);
+		n = x + y + z;
+		if (n == 0) {
+			x = 1;
+		} else {
+			x = x / n;
+			y = y / n;
+			z = z / n;
+		}
+		vector.push(x);
+		vector.push(y);
+		vector.push(z);
+		parametricRotations.push(vector);
+	}
 }
 
 ////////////
@@ -820,9 +931,16 @@ function update() {
 	carousel.rotation.y += 0.01;
 
 	for (var i = 0; i < parametricMeshes.length; i++) {
-		parametricMeshes[i].rotation.y -= 0.03;
+		parametricMeshes[i].rotation.x -= parametricRotations[i][0] * 0.06;
+		parametricMeshes[i].rotation.y -= parametricRotations[i][1] * 0.06;
+		parametricMeshes[i].rotation.z -= parametricRotations[i][2] * 0.06;
 	}
-
+	if (spotlights) {
+		for (var i = 0; i < parametricSpotlights.length; i++) {
+			parametricSpotlights[i].visible = !parametricSpotlights[i].visible;
+			spotlights = false;
+		}
+	}
 	if (ToggleDirectionalLight) {
 		directionalLight.visible = !directionalLight.visible;
 		ToggleDirectionalLight = false;
@@ -830,52 +948,52 @@ function update() {
 
 	if (GouraudActive) {
 		for (var i = 0; i < objects.length; i++) {
-            // Get an array of the color names
-            var colorNames = Object.keys(gouraudMaterials);
+			// Get an array of the color names
+			var colorNames = Object.keys(gouraudMaterials);
 
-            // Select a random color name
-            var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+			// Select a random color name
+			var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
 
-            // Use the random color name to access a random material
-            var randomMaterial = gouraudMaterials[randomColorName];
+			// Use the random color name to access a random material
+			var randomMaterial = gouraudMaterials[randomColorName];
 
-            // Assign the random material to the object
-            objects[i].material = randomMaterial;
-        }
+			// Assign the random material to the object
+			objects[i].material = randomMaterial;
+		}
 		GouraudActive = false;
 	}
 
 	if (PhongActive) {
 		for (var i = 0; i < objects.length; i++) {
-            // Get an array of the color names
-            var colorNames = Object.keys(gouraudMaterials);
+			// Get an array of the color names
+			var colorNames = Object.keys(gouraudMaterials);
 
-            // Select a random color name
-            var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+			// Select a random color name
+			var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
 
-            // Use the random color name to access a random material
-            var randomMaterial = phongMaterials[randomColorName];
+			// Use the random color name to access a random material
+			var randomMaterial = phongMaterials[randomColorName];
 
-            // Assign the random material to the object
-            objects[i].material = randomMaterial;
-        }
+			// Assign the random material to the object
+			objects[i].material = randomMaterial;
+		}
 		PhongActive = false;
 	}
 
 	if (CartoonActive) {
 		for (var i = 0; i < objects.length; i++) {
-            // Get an array of the color names
-            var colorNames = Object.keys(gouraudMaterials);
+			// Get an array of the color names
+			var colorNames = Object.keys(gouraudMaterials);
 
-            // Select a random color name
-            var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+			// Select a random color name
+			var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
 
-            // Use the random color name to access a random material
-            var randomMaterial = cartoonMaterials[randomColorName];
+			// Use the random color name to access a random material
+			var randomMaterial = cartoonMaterials[randomColorName];
 
-            // Assign the random material to the object
-            objects[i].material = randomMaterial;
-        }
+			// Assign the random material to the object
+			objects[i].material = randomMaterial;
+		}
 		CartoonActive = false;
 	}
 
@@ -899,16 +1017,16 @@ function update() {
 				originalMaterials[i] = objects[i].material;
 
 				// Get an array of the color names
-                var colorNames = Object.keys(gouraudMaterials);
+				var colorNames = Object.keys(gouraudMaterials);
 
-                // Select a random color name
-                var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
+				// Select a random color name
+				var randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)];
 
-                // Use the random color name to access a random material
-                var randomMaterial = basicMaterials[randomColorName];
+				// Use the random color name to access a random material
+				var randomMaterial = basicMaterials[randomColorName];
 
-                // Assign the random material to the object
-                objects[i].material = randomMaterial;
+				// Assign the random material to the object
+				objects[i].material = randomMaterial;
 			}
 			BasicActive = true;
 		}
@@ -935,20 +1053,20 @@ function init() {
 		antialias: true,
 	});
 
-    renderer.setPixelRatio(window.devicePixelRatio)
+	renderer.setPixelRatio(window.devicePixelRatio)
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
 	renderer.xr.enabled = true;
-    document.body.appendChild(VRButton.createButton(renderer));
+	document.body.appendChild(VRButton.createButton(renderer));
 
 	createScene();
 	createCamera();
 
 	createObjects();
+	createRandomRotation();
 
 	window.addEventListener("keydown", onKeyDown);
-	window.addEventListener("keyup", onKeyUp);
 	window.addEventListener("resize", onResize);
 }
 
@@ -969,7 +1087,7 @@ function animate() {
 	});
 
 	// requestAnimationFrame(animate);
-    renderer.setAnimationLoop(animate);
+	renderer.setAnimationLoop(animate);
 }
 
 ////////////////////////////
@@ -1027,11 +1145,25 @@ function checkBoundariesRing3() {
 ///////////////////////
 function onKeyDown(e) {
 	'use strict';
-
 	switch (e.keyCode) {
-		case 49: key1 = true; break; // 1
-		case 50: key2 = true; break; // 2
-		case 51: key3 = true; break; // 3
+		case 49: if (key1) {
+			key1 = false;
+		} else {
+			key1 = true;
+		}; break; // 1
+		case 50: if (key2) {
+			key2 = false;
+		} else {
+			key2 = true;
+		}; break; // 2
+		case 51: if (key3) {
+			key3 = false;
+		} else {
+			key3 = true;
+		}; break; // 3
+
+		case 80: spotlights = true; break; // P/p
+		case 83: spotlights = false; break; // S/s
 
 		case 68: case 100: ToggleDirectionalLight = true; break; // D/d
 
@@ -1043,18 +1175,6 @@ function onKeyDown(e) {
 		case 84: toggleBasic = true; break; // T/t
 	}
 
-}
-
-///////////////////////
-/* KEY UP CALLBACK */
-///////////////////////
-function onKeyUp(e) {
-	'use strict';
-	switch (e.keyCode) {
-		case 49: key1 = false; break; // 1
-		case 50: key2 = false; break; // 2
-		case 51: key3 = false; break; // 3
-	}
 }
 
 init();
