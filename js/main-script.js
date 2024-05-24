@@ -354,6 +354,17 @@ function createRing3(obj, x, y, z) {
 	obj.add(ring3);
 }
 
+function createSpotlight(obj, x, y, z) {
+	'use strict';
+	var spotlight = new THREE.SpotLight(0xffffff, 100, 12, Math.PI / 4);
+	spotlight.position.set(x, y, z);
+	const spotlighTarget = new THREE.Object3D();
+	spotlighTarget.position.set(x, -30, z);
+	obj.add(spotlighTarget);
+	spotlight.target = spotlighTarget;
+	obj.add(spotlight);
+	parametricSpotlights.push(spotlight);
+}
 ///////////////////////////////
 /* CREATE PARAMETRIC OBJECTS */
 ///////////////////////////////
@@ -368,9 +379,6 @@ function createParametric1(obj, x, y, z) {
 		vector.set(x - 1.5, y, z);
 	}
 
-	var spotlight = new THREE.SpotLight(0xffffff, 10, 150);
-	spotlight.position.set(x + 15, y + 15, z);
-
 	if (obj == ring1) {
 		par1R1Geometry = new ParametricGeometry(customFunction, 25, 25);
 		par1R1Mesh = new THREE.Mesh(par1R1Geometry, basicMaterials["yellow"]);
@@ -379,8 +387,6 @@ function createParametric1(obj, x, y, z) {
 		obj.add(par1R1Mesh);
 		objects.push(par1R1Mesh);
 		parametricMeshes.push(par1R1Mesh);
-
-		spotlight.target = par1R1Mesh;
 	}
 	if (obj == ring2) {
 		par1R2Geometry = new ParametricGeometry(customFunction, 25, 25);
@@ -390,8 +396,6 @@ function createParametric1(obj, x, y, z) {
 		obj.add(par1R2Mesh);
 		objects.push(par1R2Mesh);
 		parametricMeshes.push(par1R2Mesh);
-
-		spotlight.target = par1R2Mesh;
 	}
 	if (obj == ring3) {
 		par1R3Geometry = new ParametricGeometry(customFunction, 25, 25);
@@ -401,12 +405,9 @@ function createParametric1(obj, x, y, z) {
 		obj.add(par1R3Mesh);
 		objects.push(par1R3Mesh);
 		parametricMeshes.push(par1R3Mesh);
-
-		spotlight.target = par1R3Mesh;
 	}
 
-	obj.add(spotlight);
-	parametricSpotlights.push(spotlight);
+	createSpotlight(obj, x + 15, y + 10, z);
 }
 
 function createParametric2(obj, x, y, z) {
@@ -434,9 +435,6 @@ function createParametric2(obj, x, y, z) {
 		z *= scale;
 		vector.set(x - 0.4, y, z + 0.4);
 	}
-	var spotlight = new THREE.SpotLight(0xffffff, 15, 10, Math.PI / 6);
-	spotlight.position.set(x + 15, y + 10, z - 20);
-	const spotLightHelper = new THREE.SpotLightHelper(spotlight);
 
 	if (obj == ring1) {
 		par2R1Geometry = new ParametricGeometry(functionKlein, 30, 30);
@@ -446,7 +444,6 @@ function createParametric2(obj, x, y, z) {
 		obj.add(par2R1Mesh);
 		objects.push(par2R1Mesh);
 		parametricMeshes.push(par2R1Mesh);
-		spotlight.target = par2R1Mesh;
 	}
 	if (obj == ring2) {
 		par2R2Geometry = new ParametricGeometry(functionKlein, 30, 30);
@@ -456,7 +453,6 @@ function createParametric2(obj, x, y, z) {
 		obj.add(par2R2Mesh);
 		objects.push(par2R2Mesh);
 		parametricMeshes.push(par2R2Mesh);
-		spotlight.target = par2R2Mesh;
 	}
 	if (obj == ring3) {
 		par2R3Geometry = new ParametricGeometry(functionKlein, 30, 30);
@@ -466,11 +462,9 @@ function createParametric2(obj, x, y, z) {
 		obj.add(par2R3Mesh);
 		objects.push(par2R3Mesh);
 		parametricMeshes.push(par2R3Mesh);
-		spotlight.target = par2R3Mesh;
 	}
-	obj.add(spotlight);
-	obj.add(spotLightHelper);
-	parametricSpotlights.push(spotlight);
+
+	createSpotlight(obj, x + 11, y + 12.5, z - 11);
 }
 
 function createParametric3(obj, x, y, z) {
@@ -509,6 +503,7 @@ function createParametric3(obj, x, y, z) {
 
 		vector.set(xRot, yRot + 3, zpos);
 	}
+
 	if (obj == ring1) {
 		par3R1Geometry = new ParametricGeometry(functionP, 30, 30);
 		par3R1Mesh = new THREE.Mesh(par3R1Geometry, gouraudMaterials["dark blue"]);
@@ -536,6 +531,8 @@ function createParametric3(obj, x, y, z) {
 		objects.push(par3R3Mesh);
 		parametricMeshes.push(par3R3Mesh);
 	}
+
+	createSpotlight(obj, x, y + 10, z - 15);
 }
 
 function createParametric4(obj, x, y, z) {
@@ -569,6 +566,7 @@ function createParametric4(obj, x, y, z) {
 
 		vector.set(xRot, yRot, zpos);
 	}
+
 	if (obj == ring1) {
 		par4R1Geometry = new ParametricGeometry(functionP, 32, 32);
 		par4R1Mesh = new THREE.Mesh(par4R1Geometry, materials["normalMap"]);
@@ -596,6 +594,8 @@ function createParametric4(obj, x, y, z) {
 		objects.push(par4R3Mesh);
 		parametricMeshes.push(par4R3Mesh);
 	}
+
+	createSpotlight(obj, x - 11, y + 13.2, z - 11);
 }
 
 function createParametric5(obj, x, y, z) {
@@ -627,6 +627,7 @@ function createParametric5(obj, x, y, z) {
 
 		vector.set(xpos, ypos, zpos);
 	}
+
 	if (obj == ring1) {
 		par5R1Geometry = new ParametricGeometry(functionP, 25, 25);
 		par5R1Mesh = new THREE.Mesh(par5R1Geometry, cartoonMaterials["orange"]);
@@ -654,6 +655,8 @@ function createParametric5(obj, x, y, z) {
 		objects.push(par5R3Mesh);
 		parametricMeshes.push(par5R3Mesh);
 	}
+
+	createSpotlight(obj, x - 15, y + 12, z);
 }
 
 function createParametric6(obj, x, y, z) {
@@ -700,6 +703,7 @@ function createParametric6(obj, x, y, z) {
 		objects.push(par6R3Mesh);
 		parametricMeshes.push(par6R3Mesh);
 	}
+	createSpotlight(obj, x - 11, y + 12.5, z + 11);
 }
 
 function createParametric7(obj, x, y, z) {
@@ -758,6 +762,7 @@ function createParametric7(obj, x, y, z) {
 		objects.push(par7R3Mesh);
 		parametricMeshes.push(par7R3Mesh);
 	}
+	createSpotlight(obj, x, y + 11.3, z + 15);
 }
 
 function createParametric8(obj, x, y, z) {
@@ -823,6 +828,7 @@ function createParametric8(obj, x, y, z) {
 		objects.push(par8R3Mesh);
 		parametricMeshes.push(par8R3Mesh);
 	}
+	createSpotlight(obj, x + 11, y + 12.6, z + 11);
 }
 
 function createMobiusStrip(obj, x, y, z) {
