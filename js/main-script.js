@@ -369,6 +369,7 @@ function createParametric1(obj, x, y, z) {
 	}
 
 	var spotlight = new THREE.SpotLight(0xffffff, 1);
+	spotlight.position.set(x + 15, y + 15, z);
 
 	if (obj == ring1) {
 		par1R1Geometry = new ParametricGeometry(customFunction, 25, 25);
@@ -379,6 +380,7 @@ function createParametric1(obj, x, y, z) {
 		objects.push(par1R1Mesh);
 		parametricMeshes.push(par1R1Mesh);
 
+		spotlight.target = par1R1Mesh;
 	}
 	if (obj == ring2) {
 		par1R2Geometry = new ParametricGeometry(customFunction, 25, 25);
@@ -388,6 +390,8 @@ function createParametric1(obj, x, y, z) {
 		obj.add(par1R2Mesh);
 		objects.push(par1R2Mesh);
 		parametricMeshes.push(par1R2Mesh);
+
+		spotlight.target = par1R2Mesh;
 	}
 	if (obj == ring3) {
 		par1R3Geometry = new ParametricGeometry(customFunction, 25, 25);
@@ -397,10 +401,10 @@ function createParametric1(obj, x, y, z) {
 		obj.add(par1R3Mesh);
 		objects.push(par1R3Mesh);
 		parametricMeshes.push(par1R3Mesh);
+
+		spotlight.target = par1R3Mesh;
 	}
 
-	spotlight.position.set(x + 15, y + 5, z);
-	spotlight.target = par1R1Mesh;
 	obj.add(spotlight);
 	console.log(spotlight);
 	parametricSpotlights.push(spotlight);
@@ -938,8 +942,8 @@ function update() {
 	if (spotlights) {
 		for (var i = 0; i < parametricSpotlights.length; i++) {
 			parametricSpotlights[i].visible = !parametricSpotlights[i].visible;
-			spotlights = false;
 		}
+		spotlights = false;
 	}
 	if (ToggleDirectionalLight) {
 		directionalLight.visible = !directionalLight.visible;
