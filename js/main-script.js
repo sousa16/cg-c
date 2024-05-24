@@ -133,7 +133,7 @@ function createDirectionalLight() {
 
 function createAmbientLight() {
 	"use strict";
-	ambientLight = new THREE.AmbientLight(0xFFA500, 0.1);
+	ambientLight = new THREE.AmbientLight(0xFFA500, 0.4);
 	ambientLight.position.set(-10, 55, 0);
 
 	scene.add(ambientLight);
@@ -368,7 +368,7 @@ function createParametric1(obj, x, y, z) {
 		vector.set(x - 1.5, y, z);
 	}
 
-	var spotlight = new THREE.SpotLight(0xffffff, 1);
+	var spotlight = new THREE.SpotLight(0xffffff, 10, 150);
 	spotlight.position.set(x + 15, y + 15, z);
 
 	if (obj == ring1) {
@@ -406,7 +406,6 @@ function createParametric1(obj, x, y, z) {
 	}
 
 	obj.add(spotlight);
-	console.log(spotlight);
 	parametricSpotlights.push(spotlight);
 }
 
@@ -435,6 +434,10 @@ function createParametric2(obj, x, y, z) {
 		z *= scale;
 		vector.set(x - 0.4, y, z + 0.4);
 	}
+	var spotlight = new THREE.SpotLight(0xffffff, 15, 10, Math.PI / 6);
+	spotlight.position.set(x + 15, y + 10, z - 20);
+	const spotLightHelper = new THREE.SpotLightHelper(spotlight);
+
 	if (obj == ring1) {
 		par2R1Geometry = new ParametricGeometry(functionKlein, 30, 30);
 		par2R1Mesh = new THREE.Mesh(par2R1Geometry, phongMaterials["light blue"]);
@@ -443,6 +446,7 @@ function createParametric2(obj, x, y, z) {
 		obj.add(par2R1Mesh);
 		objects.push(par2R1Mesh);
 		parametricMeshes.push(par2R1Mesh);
+		spotlight.target = par2R1Mesh;
 	}
 	if (obj == ring2) {
 		par2R2Geometry = new ParametricGeometry(functionKlein, 30, 30);
@@ -452,6 +456,7 @@ function createParametric2(obj, x, y, z) {
 		obj.add(par2R2Mesh);
 		objects.push(par2R2Mesh);
 		parametricMeshes.push(par2R2Mesh);
+		spotlight.target = par2R2Mesh;
 	}
 	if (obj == ring3) {
 		par2R3Geometry = new ParametricGeometry(functionKlein, 30, 30);
@@ -461,7 +466,11 @@ function createParametric2(obj, x, y, z) {
 		obj.add(par2R3Mesh);
 		objects.push(par2R3Mesh);
 		parametricMeshes.push(par2R3Mesh);
+		spotlight.target = par2R3Mesh;
 	}
+	obj.add(spotlight);
+	obj.add(spotLightHelper);
+	parametricSpotlights.push(spotlight);
 }
 
 function createParametric3(obj, x, y, z) {
